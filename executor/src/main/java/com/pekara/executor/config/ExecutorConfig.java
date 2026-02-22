@@ -2,7 +2,7 @@ package com.pekara.executor.config;
 
 import org.aeonbits.owner.Config;
 
-@Config.Sources("system:env")
+@Config.Sources({"system:properties", "system:env"})
 public interface ExecutorConfig extends Config {
 
     @Key("COMMAND_QUEUE_URL")
@@ -30,6 +30,12 @@ public interface ExecutorConfig extends Config {
     @Key("AWS_ENDPOINT")
     String awsEndpoint();
 
+    @Key("AWS_ACCESS_KEY_ID")
+    String awsAccessKeyId();
+
+    @Key("AWS_SECRET_ACCESS_KEY")
+    String awsSecretAccessKey();
+
     @Key("DOCKER_IMAGE")
     @DefaultValue("alpine:latest")
     String dockerImage();
@@ -37,45 +43,4 @@ public interface ExecutorConfig extends Config {
     @Key("SQS_WAIT_TIME_S")
     @DefaultValue("20")
     int sqsWaitTimeSeconds();
-
-    default int getCpuCount() {
-        // Auto-detect and reserve 2 CPUs for OS/JVM overhead
-        return Runtime.getRuntime().availableProcessors() - 2;
-    }
-
-    default String getCommandQueueUrl() {
-        return commandQueueUrl();
-    }
-
-    default String getStatusQueueUrl() {
-        return statusQueueUrl();
-    }
-
-    default int getPollIntervalMs() {
-        return pollIntervalMs();
-    }
-
-    default int getVisibilityTimeoutSeconds() {
-        return visibilityTimeoutSeconds();
-    }
-
-    default int getHeartbeatIntervalSeconds() {
-        return heartbeatIntervalSeconds();
-    }
-
-    default String getAwsRegion() {
-        return awsRegion();
-    }
-
-    default String getAwsEndpoint() {
-        return awsEndpoint();
-    }
-
-    default String getDockerImage() {
-        return dockerImage();
-    }
-
-    default int getSqsWaitTimeSeconds() {
-        return sqsWaitTimeSeconds();
-    }
 }

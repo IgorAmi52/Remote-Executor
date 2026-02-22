@@ -66,7 +66,7 @@ public class TaskPollerWorker implements Runnable {
                 Optional<Task> taskOpt = executionService.pollTask();
 
                 if (taskOpt.isEmpty()) {
-                    Thread.sleep(config.getPollIntervalMs());
+                    Thread.sleep(config.pollIntervalMs());
                     continue;
                 }
 
@@ -76,15 +76,15 @@ public class TaskPollerWorker implements Runnable {
                 if (!executionService.tryAllocateResources(task)) {
                     executionService.releaseTask(task);
                     logger.info("Task {} released - not enough CPU. {}", task.getTaskId(), executionService.getResourceStatus());
-                    Thread.sleep(config.getPollIntervalMs());
+                    Thread.sleep(config.pollIntervalMs());
                     continue;
                 }
 
                 TaskWorker taskWorker = new TaskWorker(
                         task,
                         executionService,
-                        config.getVisibilityTimeoutSeconds(),
-                        config.getHeartbeatIntervalSeconds()
+                        config.visibilityTimeoutSeconds(),
+                        config.heartbeatIntervalSeconds()
                 );
                 threadPool.submit(taskWorker);
                 logger.info("Task {} submitted for execution. {}", task.getTaskId(), executionService.getResourceStatus());
@@ -96,7 +96,7 @@ public class TaskPollerWorker implements Runnable {
             } catch (Exception e) {
                 logger.error("Error in polling loop: {}", e.getMessage(), e);
                 try {
-                    Thread.sleep(config.getPollIntervalMs());
+                    Thread.sleep(config.pollIntervalMs());
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     break;

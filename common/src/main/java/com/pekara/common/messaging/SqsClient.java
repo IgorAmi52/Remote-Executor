@@ -2,7 +2,8 @@ package com.pekara.common.messaging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.model.*;
 
@@ -16,10 +17,18 @@ public class SqsClient implements AutoCloseable {
 
     private final software.amazon.awssdk.services.sqs.SqsClient client;
 
-    public SqsClient(String region, String endpoint) {
+    public SqsClient(String region, String endpoint, String accessKeyId, String secretAccessKey) {
+        if (accessKeyId == null || accessKeyId.isBlank() || secretAccessKey == null || secretAccessKey.isBlank()) {
+            throw new IllegalArgumentException("AWS credentials (accessKeyId and secretAccessKey) are required");
+        }
+
+        var credentialsProvider = StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(accessKeyId, secretAccessKey)
+        );
+
         var builder = software.amazon.awssdk.services.sqs.SqsClient.builder()
                 .region(Region.of(region))
-                .credentialsProvider(DefaultCredentialsProvider.create());
+                .credentialsProvider(credentialsProvider);
 
         if (endpoint != null && !endpoint.isBlank()) {
             builder.endpointOverride(URI.create(endpoint));
@@ -27,10 +36,6 @@ public class SqsClient implements AutoCloseable {
 
         this.client = builder.build();
         logger.info("SQS client initialized for region: {}, endpoint: {}", region, endpoint);
-    }
-
-    public SqsClient(String region) {
-        this(region, null);
     }
 
     public void sendMessage(String queueUrl, String messageBody) {

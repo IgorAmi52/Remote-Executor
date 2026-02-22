@@ -15,15 +15,17 @@ public class Main {
 
         try {
             // Load .env file if present (ignores if not found)
+            // Try current directory first, then parent directory (for monorepo structure)
             Dotenv dotenv = Dotenv.configure()
+                    .directory(".")
                     .ignoreIfMissing()
                     .load();
 
-            // Set environment variables from .env file
-            dotenv.entries().forEach(entry ->
+            // Set environment variables from .env file (use DECLARED_IN_ENV_FILE to include all entries)
+            dotenv.entries(Dotenv.Filter.DECLARED_IN_ENV_FILE).forEach(entry ->
                 System.setProperty(entry.getKey(), entry.getValue())
             );
-            logger.info(".env file loaded (if present)");
+            logger.info(".env file loaded with {} entries", dotenv.entries().size());
 
             ExecutorConfig config = ConfigFactory.create(ExecutorConfig.class);
             logger.info("Configuration loaded");
@@ -42,5 +44,9 @@ public class Main {
             logger.error("Fatal error in Executor Application: {}", e.getMessage(), e);
             System.exit(1);
         }
+    }
+
+    public static int getCpuCount() {
+        return Math.max(1, Runtime.getRuntime().availableProcessors() - 2);
     }
 }

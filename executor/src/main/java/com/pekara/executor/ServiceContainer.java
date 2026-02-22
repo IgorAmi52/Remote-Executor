@@ -31,22 +31,27 @@ public class ServiceContainer implements Closeable {
     public ServiceContainer(ExecutorConfig config) {
         this.config = config;
 
-        this.sqsClient = new SqsClient(config.getAwsRegion(), config.getAwsEndpoint());
+        this.sqsClient = new SqsClient(
+                config.awsRegion(),
+                config.awsEndpoint(),
+                config.awsAccessKeyId(),
+                config.awsSecretAccessKey()
+        );
 
         this.messageConsumer = new SqsMessageConsumer(
                 sqsClient,
-                config.getCommandQueueUrl(),
-                config.getSqsWaitTimeSeconds(),
-                config.getVisibilityTimeoutSeconds()
+                config.commandQueueUrl(),
+                config.sqsWaitTimeSeconds(),
+                config.visibilityTimeoutSeconds()
         );
 
         this.messagePublisher = new SqsMessagePublisher(
                 sqsClient,
-                config.getStatusQueueUrl()
+                config.statusQueueUrl()
         );
 
-        this.containerRunner = new DockerContainerRunner(config.getDockerImage());
-        this.resourceManager = new CpuResourceManager(config.getCpuCount());
+        this.containerRunner = new DockerContainerRunner(config.dockerImage());
+        this.resourceManager = new CpuResourceManager(Main.getCpuCount());
 
         this.executionService = new TaskExecutionService(
                 messageConsumer,
@@ -70,4 +75,5 @@ public class ServiceContainer implements Closeable {
         }
         sqsClient.close();
     }
+
 }
