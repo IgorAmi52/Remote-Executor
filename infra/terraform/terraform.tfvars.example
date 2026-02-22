@@ -1,0 +1,71 @@
+# Terraform Variables Configuration
+# Copy this file to terraform.tfvars and customize as needed
+#
+# IMPORTANT: For sensitive values (credentials), prefer using environment variables
+# with the TF_VAR_ prefix instead of hardcoding them here:
+#   export TF_VAR_aws_region="us-east-1"
+#   export TF_VAR_aws_access_key="your-access-key"
+#   export TF_VAR_aws_secret_key="your-secret-key"
+#   export TF_VAR_aws_endpoint="http://localhost:4566"
+
+# =============================================================================
+# AWS Configuration
+# =============================================================================
+# These values can be set here OR via environment variables (TF_VAR_ prefix).
+# Environment variables take precedence if both are set.
+
+aws_region     = "us-east-1"
+aws_access_key = "test"      # For real AWS, use actual credentials or env vars
+aws_secret_key = "test"      # For real AWS, use actual credentials or env vars
+
+# =============================================================================
+# LocalStack Configuration
+# =============================================================================
+# use_localstack: Controls provider behavior for local development
+#   - true:  Skips AWS credential validation, uses custom endpoints
+#   - false: Standard AWS behavior, requires valid credentials
+#
+# aws_endpoint: Custom endpoint URL for LocalStack
+#   - Only effective when use_localstack = true
+#   - For real AWS, this is ignored
+
+use_localstack = true
+aws_endpoint   = "http://localhost:4566"
+
+# =============================================================================
+# SQS Configuration
+# =============================================================================
+# queue_names: List of SQS queues to create
+#   - command-queue: Receives execution requests from clients
+#   - status-queue:  Publishes execution status updates
+
+queue_names = [
+  "command-queue",
+  "status-queue"
+]
+
+# =============================================================================
+# EC2 Configuration
+# =============================================================================
+# instance_name: Name tag for the EC2 instance
+# instance_type: EC2 instance type (determines vCPU and memory)
+#   - For LocalStack, this is metadata only (no actual instance is created)
+#   - For real AWS, choose based on workload requirements
+#   - Examples: t3.micro (dev), c7i.xlarge (prod), c7i.24xlarge (high-performance)
+# ami_id: Amazon Machine Image ID
+#   - For LocalStack, use any placeholder value
+#   - For real AWS, use a valid AMI ID for your region
+
+instance_name = "remote-executor-instance"
+instance_type = "c7i.24xlarge"    # 96 vCPU, 192GB RAM (compute optimized)
+ami_id        = "ami-12345678"    # Placeholder for LocalStack
+
+# =============================================================================
+# Resource Tags
+# =============================================================================
+# Common tags applied to all created resources for organization and billing
+
+tags = {
+  Project     = "remote-executor"
+  Environment = "localstack"      # Change to "dev", "staging", "prod" as needed
+}
