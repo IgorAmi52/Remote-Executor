@@ -50,3 +50,6 @@ build/
 **/terraform.tfvars
 **/.terraformrc
 **/terraform.rcdb/
+
+### Database ###
+db/
