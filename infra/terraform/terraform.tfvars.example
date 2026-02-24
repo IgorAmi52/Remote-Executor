@@ -1,13 +1,6 @@
 # Terraform Variables Configuration
 # Copy this file to terraform.tfvars and customize as needed
 #
-# IMPORTANT: For sensitive values (credentials), prefer using environment variables
-# with the TF_VAR_ prefix instead of hardcoding them here:
-#   export TF_VAR_aws_region="us-east-1"
-#   export TF_VAR_aws_access_key="your-access-key"
-#   export TF_VAR_aws_secret_key="your-secret-key"
-#   export TF_VAR_aws_endpoint="http://localhost:4566"
-
 # =============================================================================
 # AWS Configuration
 # =============================================================================
