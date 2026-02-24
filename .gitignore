@@ -49,4 +49,4 @@ build/
 **/terraform.tfstate.backup
 **/terraform.tfvars
 **/.terraformrc
-**/terraform.rc
+**/terraform.rcdb/
