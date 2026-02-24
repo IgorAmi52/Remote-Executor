@@ -13,7 +13,6 @@ public class Main {
 
         try {
             // Load .env file if present (ignores if not found)
-            // Try current directory first, then parent directory (for monorepo structure)
             Dotenv dotenv = Dotenv.configure()
                     .directory(".")
                     .ignoreIfMissing()

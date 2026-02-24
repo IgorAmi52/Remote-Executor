@@ -5,6 +5,9 @@ import com.pekara.controller.domain.model.Execution;
 import com.pekara.controller.domain.model.StatusTransition;
 import lombok.RequiredArgsConstructor;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +22,7 @@ public class ExecutionDetailsView {
 
     private static final DateTimeFormatter DATETIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
+    private static final int REFRESH_INTERVAL_MS = 2000;
 
     private final Scanner scanner;
     private final ExecutionQuery executionQuery;
@@ -33,6 +37,8 @@ public class ExecutionDetailsView {
         }
 
         boolean viewing = true;
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
         while (viewing) {
             Optional<Execution> executionOpt = executionQuery.findByPartialId(executionId);
 
@@ -43,16 +49,24 @@ public class ExecutionDetailsView {
 
             displayDetails(executionOpt.get());
 
-            System.out.println("\nOptions: [R]efresh | [B]ack to menu");
+            System.out.println("\nPress [B] + Enter to go back.");
             System.out.print("Choice: ");
-            String choice = scanner.nextLine().trim().toLowerCase();
 
-            switch (choice) {
-                case "r", "refresh" -> {
-                    // Loop continues, will refresh
+            // Wait for input with timeout using polling
+            long startTime = System.currentTimeMillis();
+            while (viewing && System.currentTimeMillis() - startTime < REFRESH_INTERVAL_MS) {
+                try {
+                    if (reader.ready()) {
+                        String choice = reader.readLine();
+                        if (choice != null && (choice.trim().equalsIgnoreCase("b") || choice.trim().equalsIgnoreCase("back"))) {
+                            viewing = false;
+                        }
+                    }
+                    Thread.sleep(100);
+                } catch (IOException | InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    viewing = false;
                 }
-                case "b", "back" -> viewing = false;
-                default -> System.out.println("Invalid choice. Press R to refresh or B to go back.");
             }
         }
     }
