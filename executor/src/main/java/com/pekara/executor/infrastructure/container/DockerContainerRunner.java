@@ -65,7 +65,7 @@ public class DockerContainerRunner implements ContainerRunner, AutoCloseable {
 
             CreateContainerResponse container = dockerClient.createContainerCmd(image)
                     .withHostConfig(hostConfig)
-                    .withCmd("/bin/sh", "-c", task.getScript())
+                    .withCmd("bash", "-c", task.getScript())
                     .withTty(false)
                     .exec();
 
