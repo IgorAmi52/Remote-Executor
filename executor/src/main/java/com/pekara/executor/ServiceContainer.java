@@ -1,5 +1,8 @@
 package com.pekara.executor;
 
+import com.pekara.common.json.JacksonJsonMapper;
+import com.pekara.common.json.JsonSerializer;
+import com.pekara.common.messaging.MessageQueueClient;
 import com.pekara.common.messaging.SqsClient;
 import com.pekara.executor.application.api.out.ContainerRunner;
 import com.pekara.executor.application.api.out.MessageConsumer;
@@ -19,7 +22,8 @@ import java.io.Closeable;
 public class ServiceContainer implements Closeable {
 
     private final ExecutorConfig config;
-    private final SqsClient sqsClient;
+    private final MessageQueueClient queueClient;
+    private final JsonSerializer jsonSerializer;
     private final MessageConsumer messageConsumer;
     private final MessagePublisher messagePublisher;
     private final ContainerRunner containerRunner;
@@ -31,22 +35,26 @@ public class ServiceContainer implements Closeable {
     public ServiceContainer(ExecutorConfig config) {
         this.config = config;
 
-        this.sqsClient = new SqsClient(
+        this.queueClient = new SqsClient(
                 config.awsRegion(),
                 config.awsEndpoint(),
                 config.awsAccessKeyId(),
                 config.awsSecretAccessKey()
         );
 
+        this.jsonSerializer = new JacksonJsonMapper();
+
         this.messageConsumer = new SqsMessageConsumer(
-                sqsClient,
+                queueClient,
+                jsonSerializer,
                 config.commandQueueUrl(),
                 config.sqsWaitTimeSeconds(),
                 config.visibilityTimeoutSeconds()
         );
 
         this.messagePublisher = new SqsMessagePublisher(
-                sqsClient,
+                queueClient,
+                jsonSerializer,
                 config.statusQueueUrl()
         );
 
@@ -73,7 +81,7 @@ public class ServiceContainer implements Closeable {
                 // Log or handle exception
             }
         }
-        sqsClient.close();
+        queueClient.close();
     }
 
 }
