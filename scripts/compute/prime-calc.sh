@@ -4,6 +4,7 @@
 
 LIMIT=${1:-10000}
 echo "Finding prime numbers up to $LIMIT..."
+sleep 4
 
 count=0
 for ((n=2; n<=LIMIT; n++)); do

@@ -4,6 +4,7 @@
 
 ITERATIONS=${1:-1000000}
 echo "Running $ITERATIONS calculation iterations..."
+sleep 3
 
 start_time=$(date +%s.%N)
 

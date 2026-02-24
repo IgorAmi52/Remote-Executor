@@ -6,6 +6,7 @@ echo "=== Network Connectivity Test ==="
 echo ""
 
 echo "Step 1: Check DNS resolution"
+sleep 5
 if host google.com > /dev/null 2>&1; then
     echo "DNS resolution: OK"
 else

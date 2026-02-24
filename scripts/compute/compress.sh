@@ -6,6 +6,7 @@ SIZE_MB=${1:-10}
 TEMP_FILE="/tmp/compress_test_$$"
 
 echo "Generating ${SIZE_MB}MB of random data..."
+sleep 5
 dd if=/dev/urandom of="$TEMP_FILE" bs=1M count=$SIZE_MB 2>/dev/null
 
 echo "Compressing data with gzip..."

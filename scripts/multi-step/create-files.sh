@@ -7,6 +7,7 @@ mkdir -p "$WORK_DIR"
 echo "Created work directory: $WORK_DIR"
 
 echo "Creating test files..."
+sleep 6
 for i in 1 2 3 4 5; do
     echo "Content of file $i - created at $(date)" > "$WORK_DIR/file_$i.txt"
     echo "Created file_$i.txt"

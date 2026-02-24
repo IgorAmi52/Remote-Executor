@@ -6,6 +6,7 @@ echo "=== Pipeline Test ==="
 echo ""
 
 echo "Step 1: Generate data"
+sleep 4
 DATA=$(seq 1 100)
 echo "Generated numbers 1-100"
 
