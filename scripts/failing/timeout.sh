@@ -1,7 +1,7 @@
 #!/bin/bash
 # Long running script - may timeout depending on executor config
 # Useful for testing timeout handling
-
+set -e  # Exit immediately if any command fails
 echo "Starting long-running task..."
 echo "This will run for 5 minutes (300 seconds)"
 

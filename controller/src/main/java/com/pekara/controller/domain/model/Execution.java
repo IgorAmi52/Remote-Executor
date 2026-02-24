@@ -25,7 +25,7 @@ public class Execution {
 
     public boolean canTransitionTo(ExecutionStatus newStatus) {
         return switch (currentStatus) {
-            case QUEUED -> newStatus == ExecutionStatus.IN_PROGRESS;
+            case QUEUED -> newStatus == ExecutionStatus.IN_PROGRESS || newStatus == ExecutionStatus.FAILED;
             case IN_PROGRESS -> newStatus == ExecutionStatus.FINISHED || newStatus == ExecutionStatus.FAILED;
             case FINISHED, FAILED -> false; // Terminal states
         };
