@@ -73,4 +73,15 @@ public class TaskExecutionService {
         return String.format("CPUs: %d/%d available",
                 resourceManager.getAvailableCpus(), resourceManager.getTotalCpus());
     }
+
+    public int getTotalCpus() {
+        return resourceManager.getTotalCpus();
+    }
+
+    public void failTaskImmediately(Task task, String reason) {
+        logger.warn("Failing task {} immediately: {}", task.getTaskId(), reason);
+        TaskResult result = TaskResult.failed(task.getTaskId(), reason, -2);
+        messagePublisher.publishStatus(result);
+        messageConsumer.deleteTask(task);
+    }
 }

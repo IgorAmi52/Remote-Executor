@@ -73,6 +73,17 @@ public class TaskPollerWorker implements Runnable {
                 Task task = taskOpt.get();
                 logger.info("Received task: {} (requires {} CPUs)", task.getTaskId(), task.getRequiredCpus());
 
+                // Check if task can ever execute on this executor
+                if (task.getRequiredCpus() > executionService.getTotalCpus()) {
+                    String errorMsg = String.format(
+                            "Task requires %d CPUs but executor only has %d CPUs total. Task cannot be executed on this executor.",
+                            task.getRequiredCpus(), executionService.getTotalCpus()
+                    );
+                    logger.error("Rejecting impossible task {}: {}", task.getTaskId(), errorMsg);
+                    executionService.failTaskImmediately(task, errorMsg);
+                    continue;
+                }
+
                 if (!executionService.tryAllocateResources(task)) {
                     executionService.releaseTask(task);
                     logger.info("Task {} released - not enough CPU. {}", task.getTaskId(), executionService.getResourceStatus());
