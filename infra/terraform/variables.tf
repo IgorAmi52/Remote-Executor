@@ -35,21 +35,6 @@ variable "queue_names" {
   type        = list(string)
 }
 
-variable "instance_name" {
-  description = "Name for the EC2 instance"
-  type        = string
-}
-
-variable "instance_type" {
-  description = "EC2 instance type (controls vCPU and memory allocation)"
-  type        = string
-}
-
-variable "ami_id" {
-  description = "AMI ID for the EC2 instance"
-  type        = string
-}
-
 variable "tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)

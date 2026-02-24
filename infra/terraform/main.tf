@@ -21,7 +21,6 @@ provider "aws" {
     for_each = var.use_localstack && var.aws_endpoint != "" ? [1] : []
     content {
       sqs = var.aws_endpoint
-      ec2 = var.aws_endpoint
     }
   }
 }
@@ -31,13 +30,4 @@ module "sqs" {
 
   queue_names = var.queue_names
   tags        = var.tags
-}
-
-module "ec2" {
-  source = "./modules/ec2"
-
-  instance_name = var.instance_name
-  instance_type = var.instance_type
-  ami_id        = var.ami_id
-  tags          = var.tags
 }

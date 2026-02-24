@@ -45,22 +45,6 @@ queue_names = [
 ]
 
 # =============================================================================
-# EC2 Configuration
-# =============================================================================
-# instance_name: Name tag for the EC2 instance
-# instance_type: EC2 instance type (determines vCPU and memory)
-#   - For LocalStack, this is metadata only (no actual instance is created)
-#   - For real AWS, choose based on workload requirements
-#   - Examples: t3.micro (dev), c7i.xlarge (prod), c7i.24xlarge (high-performance)
-# ami_id: Amazon Machine Image ID
-#   - For LocalStack, use any placeholder value
-#   - For real AWS, use a valid AMI ID for your region
-
-instance_name = "remote-executor-instance"
-instance_type = "c7i.24xlarge"    # 96 vCPU, 192GB RAM (compute optimized)
-ami_id        = "ami-12345678"    # Placeholder for LocalStack
-
-# =============================================================================
 # Resource Tags
 # =============================================================================
 # Common tags applied to all created resources for organization and billing
