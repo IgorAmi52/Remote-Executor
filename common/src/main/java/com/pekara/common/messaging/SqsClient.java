@@ -11,7 +11,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-public class SqsClient implements AutoCloseable {
+public class SqsClient implements MessageQueueClient {
 
     private static final Logger logger = LoggerFactory.getLogger(SqsClient.class);
 
@@ -38,6 +38,7 @@ public class SqsClient implements AutoCloseable {
         logger.info("SQS client initialized for region: {}, endpoint: {}", region, endpoint);
     }
 
+    @Override
     public void sendMessage(String queueUrl, String messageBody) {
         SendMessageRequest request = SendMessageRequest.builder()
                 .queueUrl(queueUrl)
@@ -48,7 +49,8 @@ public class SqsClient implements AutoCloseable {
         logger.debug("Message sent to queue: {}", queueUrl);
     }
 
-    public List<Message> receiveMessages(String queueUrl, int maxMessages, int waitTimeSeconds, int visibilityTimeout) {
+    @Override
+    public List<QueueMessage> receiveMessages(String queueUrl, int maxMessages, int waitTimeSeconds, int visibilityTimeout) {
         ReceiveMessageRequest request = ReceiveMessageRequest.builder()
                 .queueUrl(queueUrl)
                 .maxNumberOfMessages(maxMessages)
@@ -57,17 +59,21 @@ public class SqsClient implements AutoCloseable {
                 .build();
 
         ReceiveMessageResponse response = client.receiveMessage(request);
-        List<Message> messages = response.messages();
+        List<QueueMessage> messages = response.messages().stream()
+                .map(m -> new QueueMessage(m.messageId(), m.body(), m.receiptHandle()))
+                .toList();
 
         logger.debug("Received {} messages from queue: {}", messages.size(), queueUrl);
         return messages;
     }
 
-    public Optional<Message> receiveMessage(String queueUrl, int waitTimeSeconds, int visibilityTimeout) {
-        List<Message> messages = receiveMessages(queueUrl, 1, waitTimeSeconds, visibilityTimeout);
-        return messages.isEmpty() ? Optional.empty() : Optional.of(messages.get(0));
+    @Override
+    public Optional<QueueMessage> receiveMessage(String queueUrl, int waitTimeSeconds, int visibilityTimeout) {
+        List<QueueMessage> messages = receiveMessages(queueUrl, 1, waitTimeSeconds, visibilityTimeout);
+        return messages.isEmpty() ? Optional.empty() : Optional.of(messages.getFirst());
     }
 
+    @Override
     public void deleteMessage(String queueUrl, String receiptHandle) {
         DeleteMessageRequest request = DeleteMessageRequest.builder()
                 .queueUrl(queueUrl)
@@ -78,6 +84,7 @@ public class SqsClient implements AutoCloseable {
         logger.debug("Message deleted from queue: {}", queueUrl);
     }
 
+    @Override
     public void changeMessageVisibility(String queueUrl, String receiptHandle, int visibilityTimeout) {
         ChangeMessageVisibilityRequest request = ChangeMessageVisibilityRequest.builder()
                 .queueUrl(queueUrl)

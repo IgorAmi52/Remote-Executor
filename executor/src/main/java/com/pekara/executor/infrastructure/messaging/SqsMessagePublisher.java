@@ -1,7 +1,7 @@
 package com.pekara.executor.infrastructure.messaging;
 
-import com.pekara.common.json.JsonMapper;
-import com.pekara.common.messaging.SqsClient;
+import com.pekara.common.json.JsonSerializer;
+import com.pekara.common.messaging.MessageQueueClient;
 import com.pekara.executor.application.api.out.MessagePublisher;
 import com.pekara.executor.domain.model.TaskResult;
 import com.pekara.executor.dto.StatusMessageDto;
@@ -12,11 +12,13 @@ public class SqsMessagePublisher implements MessagePublisher {
 
     private static final Logger logger = LoggerFactory.getLogger(SqsMessagePublisher.class);
 
-    private final SqsClient sqsClient;
+    private final MessageQueueClient queueClient;
+    private final JsonSerializer jsonSerializer;
     private final String queueUrl;
 
-    public SqsMessagePublisher(SqsClient sqsClient, String queueUrl) {
-        this.sqsClient = sqsClient;
+    public SqsMessagePublisher(MessageQueueClient queueClient, JsonSerializer jsonSerializer, String queueUrl) {
+        this.queueClient = queueClient;
+        this.jsonSerializer = jsonSerializer;
         this.queueUrl = queueUrl;
     }
 
@@ -29,8 +31,8 @@ public class SqsMessagePublisher implements MessagePublisher {
                 result.getExitCode()
         );
 
-        String json = JsonMapper.toJson(dto);
-        sqsClient.sendMessage(queueUrl, json);
+        String json = jsonSerializer.toJson(dto);
+        queueClient.sendMessage(queueUrl, json);
         logger.info("Published status for task {}: {}", result.getTaskId(), result.getStatus());
     }
 }
