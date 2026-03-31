@@ -20,6 +20,7 @@ public class TaskPollerWorker implements Runnable {
     private final ExecutorConfig config;
     private final ExecutorService threadPool;
     private final AtomicBoolean running;
+    private Thread pollerThread;
 
     public TaskPollerWorker(TaskExecutionService executionService, ExecutorConfig config) {
         this.executionService = executionService;
@@ -30,9 +31,15 @@ public class TaskPollerWorker implements Runnable {
 
     public void start() {
         if (running.compareAndSet(false, true)) {
-            Thread pollerThread = new Thread(this, "task-poller");
+            pollerThread = new Thread(this, "task-poller");
             pollerThread.start();
             logger.info("Task poller started. {}", executionService.getResourceStatus());
+        }
+    }
+
+    public void awaitTermination() throws InterruptedException {
+        if (pollerThread != null) {
+            pollerThread.join();
         }
     }
 

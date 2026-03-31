@@ -38,7 +38,7 @@ public class Main {
                 }));
 
                 container.getPollerWorker().start();
-                Thread.currentThread().join();
+                container.getPollerWorker().awaitTermination();
             }
         } catch (Exception e) {
             logger.error("Fatal error in Executor Application: {}", e.getMessage(), e);
